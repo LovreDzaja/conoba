@@ -77,12 +77,13 @@ body {
 input {
     display: block;
     font-size: 14pt;
-    line-height: 28pt; /* 14pt * 2 */
+    line-height: 28pt; 
     font-family: 'Fjalla One', sans-serif;
-    margin-bottom: 28pt; /* 14pt * 2 */
+    margin-bottom: 28pt; 
     border: none;
     border-bottom: 5px solid rgba(0,0,0,1);
     background: #f8f4e5;
+    min-width: 240px;
     padding-left: 5px;
     outline: none;
     color: rgba(0,0,0,1);
@@ -95,7 +96,7 @@ input:focus {
 button {
     display: block;
     margin: 0 auto;
-    line-height: 28pt; /* 14pt * 2 */
+    line-height: 28pt; 
     padding: 0 20px;
     background: #ffa580;
     letter-spacing: 2px;
@@ -127,6 +128,10 @@ input:-webkit-autofill:focus {
 @media (max-width: 768px) {
   .form{
     padding: 25px 50px;
+  }
+
+  input{
+     min-width: 240px;
   }
 }
 

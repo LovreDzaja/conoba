@@ -10,22 +10,44 @@ const error = ref('');
 const router = useRouter();
 
 const handleSignup = async () => {
+  error.value = '';
   const { data, error: signUpError } = await supabase.auth.signUp({
     email: email.value,
     password: password.value,
     options: {
       data: {
         full_name: fullName.value,
-      }
-    }
+      },
+    },
   });
+
 
   if (signUpError) {
     error.value = signUpError.message;
-  } else {
-    router.push('/');
+    return;
   }
+
+  const {
+    data: sessionData,
+    error: sessionError
+  } = await supabase.auth.getSession();
+
+  const userId = sessionData?.session?.user?.id;
+
+  if (sessionError || !userId) {
+    error.value = 'User session not ready';
+    return;
+  }
+
+  if (profileError) {
+    error.value = 'Failed to create profile: ' + profileError.message;
+    return;
+  }
+
+  router.push('/');
 };
+
+
 </script>
 
 
@@ -77,12 +99,13 @@ body {
 input {
     display: block;
     font-size: 14pt;
-    line-height: 28pt; /* 14pt * 2 */
+    line-height: 28pt; 
     font-family: 'Fjalla One', sans-serif;
-    margin-bottom: 28pt; /* 14pt * 2 */
+    margin-bottom: 28pt; 
     border: none;
     border-bottom: 5px solid rgba(0,0,0,1);
     background: #f8f4e5;
+    min-width: 240px;
     padding-left: 5px;
     outline: none;
     color: rgba(0,0,0,1);
@@ -95,7 +118,7 @@ input:focus {
 button {
     display: block;
     margin: 0 auto;
-    line-height: 28pt; /* 14pt * 2 */
+    line-height: 28pt; 
     padding: 0 20px;
     background: #ffa580;
     letter-spacing: 2px;
