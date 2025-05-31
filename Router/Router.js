@@ -5,6 +5,7 @@ import LogIn from "../src/components/LogIn.vue"
 import SignUp from "../src/components/SignUp.vue"
 import MainPage from "../src/components/MainPage.vue"
 import NotFound from "../src/components/NotFound.vue";
+import ResetPassword from "../src/components/ResetPassword.vue";
 
 
 const router = createRouter({
@@ -13,6 +14,11 @@ const router = createRouter({
     { 
       path: '/:catchAll(.*)',
       component: NotFound 
+    },
+    {
+      path: '/reset-password',
+      name: 'reset-password',
+      component: ResetPassword
     },
     {
       path: '/',
