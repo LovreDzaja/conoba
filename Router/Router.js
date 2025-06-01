@@ -11,10 +11,6 @@ import ResetPassword from "../src/components/ResetPassword.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    { 
-      path: '/:catchAll(.*)',
-      component: NotFound 
-    },
     {
       path: '/reset-password',
       name: 'reset-password',
@@ -35,6 +31,10 @@ const router = createRouter({
       name: 'mainPage',
       component: MainPage,
       meta: { requiresAuth: true }
+    },
+    { 
+      path: '/:catchAll(.*)',
+      component: NotFound 
     }
   ]
 })

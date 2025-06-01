@@ -13,8 +13,6 @@ const loading = ref(true);
 const showNewPassword = ref(false);
 const showConfirmPassword = ref(false);
 
-
-
 onMounted(async () => {
   const { data, error: sessionError } = await supabase.auth.getSession();
 
