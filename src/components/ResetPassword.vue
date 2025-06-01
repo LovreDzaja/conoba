@@ -21,13 +21,36 @@ onMounted(async () => {
   }
   loading.value = false;
 });
+const trimPasswords = () => {
+  newPassword.value = newPassword.value.trim();
+  confirmPassword.value = confirmPassword.value.trim();
+};
+
+let attempts = 0;
 
 const updatePassword = async () => {
   error.value = '';
   success.value = '';
 
-  if (newPassword.value.length < 6) {
-    error.value = 'Password must be at least 6 characters long.';
+  if (attempts >= 5) {
+    error.value = 'Too many failed attempts. Please try again later.';
+    return;
+  }
+
+  trimPasswords();
+
+  if (newPassword.value.length < 8) {
+    error.value = 'Password must be at least 8 characters long.';
+    return;
+  }
+
+  if (!/[A-Z]/.test(newPassword.value) || !/[a-z]/.test(newPassword.value) || !/\d/.test(newPassword.value)) {
+    error.value = 'Password must include uppercase, lowercase, and a number.';
+    return;
+  }
+
+  if (newPassword.value === 'password' || newPassword.value === '123456') {
+    error.value = 'Choose a stronger, less common password.';
     return;
   }
 
@@ -41,12 +64,14 @@ const updatePassword = async () => {
   });
 
   if (updateError) {
+    attempts++;
     error.value = updateError.message;
   } else {
     success.value = 'Your password has been updated!';
-    setTimeout(() => router.push('/'), 1000); 
+    setTimeout(() => router.push('/'), 1000);
   }
 };
+
 </script>
 
 <template>
