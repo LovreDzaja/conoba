@@ -347,7 +347,7 @@ onMounted(() => {
       <h1 class="error-code">404</h1>
       <p class="message" v-if="filteredProjects.length === 1">Oops! There are no projects for this language: </p>
       <p class="message" v-else>Oops! There are no projects at this time :(</p>
-        <div class="selected-langs">
+        <div class="selected-langs" v-if="filteredProjects.length">
           <button
             v-for="(lang, index) in filter"
             :key="'selected-' + lang"
