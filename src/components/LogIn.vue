@@ -104,7 +104,4 @@ const handleLogin = async () => {
         <p class="back" @click="showReset = false">⬅ Back to login</p>
       </div> 
   </div>
-
-
-
 </template>

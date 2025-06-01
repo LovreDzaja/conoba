@@ -276,6 +276,21 @@ const selectedLanguagesText = computed(() => {
 
       </div>
     </div>
+    <div v-else class="notfound-wrapper">
+      <h1 class="error-code">404</h1>
+      <p class="message">Oops! There are no projects for this language:
+        <div class="selected-langs">
+          <button
+            v-for="(lang, index) in filter"
+            :key="'selected-' + lang"
+            :class="[index % 2 === 0 ? 'half-left-buttons' : 'half-right-buttons']"
+          >
+            {{ lang }}
+          </button>
+        </div>
+      </p>
+    </div>
+
     <div class="pagination" v-if="totalPages > 1">
       <button @click="currentPage--" :disabled="currentPage === 1">Previous</button>
 
@@ -291,20 +306,10 @@ const selectedLanguagesText = computed(() => {
       <button @click="currentPage++" :disabled="currentPage === totalPages">Next</button>
     </div>
 
-    <div v-else class="notfound-wrapper">
-      <h1 class="error-code">404</h1>
-      <p class="message">Oops! There are no projects for this language:
-        <div class="selected-langs">
-          <button
-            v-for="(lang, index) in filter"
-            :key="'selected-' + lang"
-            :class="[index % 2 === 0 ? 'half-left-buttons' : 'half-right-buttons']"
-          >
-            {{ lang }}
-          </button>
-        </div>
-      </p>
+    <div v-if="currentPage === totalPages && paginatedProjects.length < itemsPerPage" class="end-of-results-alert">
+      <p>🎉 You’ve reached the end of the project list!</p>
     </div>
+
 
     <button class="fab" @click="toggleForm">
       <span :class="{ rotated: showForm }">{{ showForm ? '✖' : '✖' }}</span>
@@ -352,7 +357,3 @@ const selectedLanguagesText = computed(() => {
     </transition>
   </div>
 </template>
-<style scoped>
-
-
-</style>
