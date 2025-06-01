@@ -24,7 +24,45 @@ const projects = ref([]);
 const currentUser = ref(null);
 const filter = ref([]);
 
-const languages = ['JavaScript', 'Python', 'Vue', 'React', 'Node.js', 'TypeScript', 'Go', 'PHP', 'Ruby', 'C#', 'C++','C', 'All'];
+const languages = [
+  'JavaScript',
+  'TypeScript',
+  'HTML',
+  'CSS',
+  'React',
+  'Vue',
+  'Angular',
+  'Next.js',
+  'Nuxt.js',
+  'Svelte',
+  'Node.js',
+  'Express.js',
+  'Python',
+  'Django',
+  'Flask',
+  'FastAPI',
+  'PHP',
+  'Laravel',
+  'Ruby',
+  'Ruby on Rails',
+  'Java',
+  'Spring Boot',
+  'Go',
+  'Dart',
+  'Flutter',
+  'Kotlin',
+  'Swift',
+  'React Native',
+  'Firebase',
+  'Supabase',
+  'ASP.NET',
+  'GraphQL',
+  'Shell',
+  'Bash',
+  'SQL',
+  'R',
+  'All'
+];
 
 watch(filter, ()=>{
   currentPage.value = 1;
