@@ -210,17 +210,13 @@ onMounted(() => {
   fetchUser();
 });
 
-const selectedLanguagesText = computed(() => {
-  return filter.value.length > 0 ? filter.value.join(', ') : 'N/A';
-});
-
 </script>
 
 <template>
   <div class="app-wrapper">
     <nav class="navbar">
       <div class="nav-side">
-        <span class="user-label">👤 lovre</span>
+        <span class="user-label" >👤 {{username}}</span>
       </div>
 
       <div class="logo-area">
