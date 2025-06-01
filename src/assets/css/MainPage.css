@@ -326,6 +326,98 @@ button:hover {
   color: #95a4ff;
 }
 
+.selected-langs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.selected-langs button {
+  border: 1px solid #ffa580;
+  background-color: #ffe2d1;
+  color: #333;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-family: 'Fjalla One', sans-serif;
+  box-shadow: 2px 2px 0 #ffa580, 2px 2px 0 1px black;
+  transition: all 0.2s ease;
+  cursor: default;
+}
+
+.selected-langs button:hover {
+  background: #526A69;
+  color: white;
+}
+
+.half-left-buttons {
+  background-color: #ffc2a1;
+}
+
+.half-right-buttons {
+  background-color: #ffd6b5;
+}
+
+.lang-filter,
+.lang-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.lang-filter button,
+.lang-selector button {
+  border: 1px solid #ffa580;
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  font-family: 'Fjalla One', sans-serif;
+  box-shadow: 2px 2px 0 #ffa580, 2px 2px 0 1px black;
+  transition: all 0.2s ease;
+}
+
+.lang-filter button.active,
+.lang-selector button.active {
+  background: #ffa580;
+  color: black;
+  box-shadow: 2px 2px 0 #95a4ff, 2px 2px 0 1px black;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.pagination button {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #ffa580;
+  color: #526A69;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.pagination button.active {
+  background-color: #ffa580;
+  color: black;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination button:hover{
+  background: #526A69;
+  color: white;
+}
+
+
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;

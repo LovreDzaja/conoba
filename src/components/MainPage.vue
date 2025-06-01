@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { supabase } from '../supabase';
 import router from '../../Router/Router';
 
@@ -29,6 +29,10 @@ const filter = ref([]);
 
 const languages = ['JavaScript', 'Python', 'Vue', 'React', 'Node.js', 'TypeScript', 'Go', 'PHP', 'Ruby', 'C#', 'C++', 'All'];
 
+watch(filter, ()=>{
+  currentPage.value = 1;
+})
+
 const toggleForm = () => {
   showForm.value = !showForm.value;
   resetForm();
@@ -54,7 +58,22 @@ const fetchProjects = async () => {
   if (fetchError) {
     error.value = fetchError.message;
   } else {
-    projects.value = data;
+    projects.value = data.map(project => {
+      let normalizedLanguages;
+
+      try {
+        const parsed = JSON.parse(project.language);
+        normalizedLanguages = Array.isArray(parsed) ? parsed : [project.language];
+      } catch {
+        normalizedLanguages = [project.language];
+      }
+
+      return {
+        ...project,
+        language: normalizedLanguages,
+      };
+    });
+
   }
 };
 
@@ -73,7 +92,7 @@ const fetchUser = async () => {
 const resetForm = () => {
   title.value = '';
   description.value = '';
-  language.value = '';
+  language.value = [];
   github.value = '';
   linkedin.value = '';
   discord.value = '';
@@ -158,9 +177,9 @@ const handleSignOut = async () => {
 const toggleFilterLanguage = (lang) => {
   const index = filter.value.indexOf(lang);
   if (index > -1) {
-    filter.value.splice(index, 1); // remove it
+    filter.value.splice(index, 1); 
   } else {
-    filter.value.push(lang); // add it
+    filter.value.push(lang);
   }
 };
 
@@ -168,17 +187,29 @@ const filteredProjects = computed(() => {
   if (!filter.value.length || filter.value.includes('All')) return projects.value;
 
   return projects.value.filter(project => {
-    const langs = project.language?.split(',') || [];
-    return langs.some(lang => filter.value.includes(lang.trim()));
+    const langs = project.language || [];
+    return filter.value.every(lang => langs.includes(lang));
   });
 });
 
+const currentPage = ref(1);
+const itemsPerPage = 5;
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredProjects.value.length / itemsPerPage);
+});
+
+const paginatedProjects = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredProjects.value.slice(start, end);
+});
 
 onMounted(() => {
   fetchProjects();
   fetchUser();
 });
-console.log(projects)
+
 const selectedLanguagesText = computed(() => {
   return filter.value.length > 0 ? filter.value.join(', ') : 'N/A';
 });
@@ -220,10 +251,17 @@ const selectedLanguagesText = computed(() => {
     </div>
 
     <div class="project-list" v-if="filteredProjects.length">
-      <div v-for="project in filteredProjects" :key="project.id" class="project-card">
-        <h3>{{ project.title }}</h3>
+      <div v-for="project in paginatedProjects" :key="project.id" class="project-card">        <h3>{{ project.title }}</h3>
         <p><strong>Posted by:</strong> {{ project.profiles?.full_name || 'Unknown user' }}</p>
-        <p><strong>Language:</strong> {{ project.language }}</p>
+        <p><strong>{{project.language.length > 1 ? 'Languages:' : 'Language: '}}</strong> 
+        <span
+          v-for="(lang, index) in project.language"
+          :key="'selected-' + lang"
+          :class="[index % 2 === 0 ? 'half-left' : 'half-right', 'lang-pill']"
+        >
+          {{ lang }}<span v-if="project.language.length > 1 && index < project.language.length - 1"> \ </span>
+        </span>
+        </p>
         <p>{{ project.description }}</p>
         <p class="meta">Posted: {{ new Date(project.created_at).toLocaleString() }}</p>
         <div class="social-links">
@@ -238,17 +276,32 @@ const selectedLanguagesText = computed(() => {
 
       </div>
     </div>
+    <div class="pagination" v-if="totalPages > 1">
+      <button @click="currentPage--" :disabled="currentPage === 1">Previous</button>
+
+      <button
+        v-for="page in totalPages"
+        :key="'page-' + page"
+        @click="currentPage = page"
+        :class="{ active: currentPage === page }"
+      >
+        {{ page }}
+      </button>
+
+      <button @click="currentPage++" :disabled="currentPage === totalPages">Next</button>
+    </div>
+
     <div v-else class="notfound-wrapper">
       <h1 class="error-code">404</h1>
       <p class="message">Oops! There are no projects for this language:
         <div class="selected-langs">
-          <span
+          <button
             v-for="(lang, index) in filter"
             :key="'selected-' + lang"
-            :class="[index % 2 === 0 ? 'half-left' : 'half-right', 'lang-pill']"
+            :class="[index % 2 === 0 ? 'half-left-buttons' : 'half-right-buttons']"
           >
-            {{ lang }}<span v-if="filter.length > 1 && index < filter.length - 1">,</span>
-          </span>
+            {{ lang }}
+          </button>
         </div>
       </p>
     </div>
@@ -263,9 +316,24 @@ const selectedLanguagesText = computed(() => {
           <h2>{{ isEditing ? 'Edit Project' : 'New Project' }}</h2>
           <input v-model="title" placeholder="Project Title" required />
           <textarea v-model="description" placeholder="Description" required></textarea>
-          <select v-model="language" multiple class="multi-select" required>
-            <option v-for="lang in languages.slice(0, -1)" :key="lang">{{ lang }}</option>
-          </select>
+          <div class="lang-selector">
+            <button
+              v-for="lang in languages.slice(0, -1)"
+              :key="'lang-select-' + lang"
+              :class="{ active: language.includes(lang) }"
+              type="button"
+              @click="() => {
+                const index = language.indexOf(lang);
+                if (index > -1) {
+                  language.splice(index, 1);
+                } else {
+                  language.push(lang);
+                }
+              }"
+            >
+              {{ lang }}
+            </button>
+          </div>
 
           <input
             v-model="github"
@@ -285,30 +353,6 @@ const selectedLanguagesText = computed(() => {
   </div>
 </template>
 <style scoped>
-.lang-filter,
-.lang-selector {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 1rem 0;
-}
 
-.lang-filter button,
-.lang-selector button {
-  border: 1px solid #ffa580;
-  border-radius: 8px;
-  padding: 0.4rem 0.8rem;
-  cursor: pointer;
-  font-family: 'Fjalla One', sans-serif;
-  box-shadow: 2px 2px 0 #ffa580, 2px 2px 0 1px black;
-  transition: all 0.2s ease;
-}
-
-.lang-filter button.active,
-.lang-selector button.active {
-  background: #ffa580;
-  color: black;
-  box-shadow: 2px 2px 0 #95a4ff, 2px 2px 0 1px black;
-}
 
 </style>
