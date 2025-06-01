@@ -79,6 +79,8 @@ const sendPasswordReset = async () => {
     resetError.value = '';
     resetEmail.value = '';
   }
+
+  alert('Please check your email.');
 };
 </script>
 
