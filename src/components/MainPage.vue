@@ -3,7 +3,6 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { supabase } from '../supabase';
 import router from '../../Router/Router';
 
-
 import '../assets/css/MainPage.css';
 
 const showForm = ref(false);
@@ -18,7 +17,6 @@ const linkedin = ref('');
 const discord = ref('');
 const username = ref('');
 
-
 const success = ref('');
 const error = ref('');
 const loading = ref(false);
@@ -26,8 +24,7 @@ const projects = ref([]);
 const currentUser = ref(null);
 const filter = ref([]);
 
-
-const languages = ['JavaScript', 'Python', 'Vue', 'React', 'Node.js', 'TypeScript', 'Go', 'PHP', 'Ruby', 'C#', 'C++', 'All'];
+const languages = ['JavaScript', 'Python', 'Vue', 'React', 'Node.js', 'TypeScript', 'Go', 'PHP', 'Ruby', 'C#', 'C++','C', 'All'];
 
 watch(filter, ()=>{
   currentPage.value = 1;
@@ -73,7 +70,6 @@ const fetchProjects = async () => {
         language: normalizedLanguages,
       };
     });
-
   }
 };
 
@@ -104,13 +100,39 @@ const resetForm = () => {
 
 const formatUrl = (url) => {
   if (!url) return '';
-  return url.startsWith('https://') ? url : `https://${url}`;
+  return url.startsWith('https://') || url.startsWith('http://') ? url : `https://${url}`;
 };
+
+
+const isValidUrl = (url) => {
+  try {
+    const parsed = new URL(formatUrl(url));
+    return ['https:', 'http:'].includes(parsed.protocol);
+  } catch {
+    return false;
+  }
+};
+
+const safeUrl = (url) => {
+  return isValidUrl(url) ? formatUrl(url) : '';
+};
+
+const sanitizeInput = (str) => str.trim().replace(/[<>]/g, '');
+
+const allowedLanguages = new Set(languages.slice(0, -1));
+
+const sanitizedLanguages = language.value.filter((lang) =>
+  allowedLanguages.has(lang)
+);
 
 const handleSubmit = async () => {
   error.value = '';
   success.value = '';
   loading.value = true;
+
+  const sanitizedLanguages = language.value.filter((lang) =>
+    allowedLanguages.has(lang)
+  );
 
   if (!currentUser.value?.id) {
     error.value = 'You must be logged in to post a project.';
@@ -124,13 +146,25 @@ const handleSubmit = async () => {
     return;
   }
 
+  if (title.value.length > 100 || description.value.length > 1000) {
+    error.value = 'Title or description is too long.';
+    loading.value = false;
+    return;
+  }
+
+  if (sanitizedLanguages.length === 0) {
+    error.value = 'Please select at least one programming language.';
+    loading.value = false;
+    return;
+  }
+
   const payload = {
-    title: title.value,
-    description: description.value,
-    language: language.value,
-    github: formatUrl(github.value),
-    linkedin: formatUrl(linkedin.value),
-    discord: formatUrl(discord.value),
+    title: sanitizeInput(title.value),
+    description: sanitizeInput(description.value),
+    language: sanitizedLanguages,
+    github: safeUrl(github.value),
+    linkedin: safeUrl(linkedin.value),
+    discord: safeUrl(discord.value),
     user_id: currentUser.value.id,
   };
 
@@ -150,6 +184,7 @@ const handleSubmit = async () => {
   }
   loading.value = false;
 };
+
 
 const startEdit = (project) => {
   showForm.value = true;
@@ -228,7 +263,6 @@ onMounted(() => {
       </div>
     </nav>
 
-
     <div class="filter-section">
       <label for="filter">Filter by language:</label>
       <div class="filter-section">
@@ -269,12 +303,12 @@ onMounted(() => {
           <button class="edit-btn" @click="startEdit(project)">Edit</button>
           <button class="delete-btn" @click="handleDelete(project.id)">Delete</button>
         </div>
-
       </div>
     </div>
     <div v-else class="notfound-wrapper">
       <h1 class="error-code">404</h1>
-      <p class="message">Oops! There are no projects for this language:
+      <p class="message" v-if="filteredProjects.length === 1">Oops! There are no projects for this language: </p>
+      <p class="message" v-else>Oops! There are no projects at this time :(</p>
         <div class="selected-langs">
           <button
             v-for="(lang, index) in filter"
@@ -284,12 +318,11 @@ onMounted(() => {
             {{ lang }}
           </button>
         </div>
-      </p>
+
     </div>
 
     <div class="pagination" v-if="totalPages > 1">
       <button @click="currentPage--" :disabled="currentPage === 1">Previous</button>
-
       <button
         v-for="page in totalPages"
         :key="'page-' + page"
@@ -298,14 +331,12 @@ onMounted(() => {
       >
         {{ page }}
       </button>
-
       <button @click="currentPage++" :disabled="currentPage === totalPages">Next</button>
     </div>
 
     <div v-if="currentPage === totalPages && paginatedProjects.length < itemsPerPage" class="end-of-results-alert">
       <p>🎉 You’ve reached the end of the project list!</p>
     </div>
-
 
     <button class="fab" @click="toggleForm">
       <span :class="{ rotated: showForm }">{{ showForm ? '✖' : '✖' }}</span>
@@ -338,11 +369,11 @@ onMounted(() => {
 
           <input
             v-model="github"
-            placeholder="GitHub (optional)"
+            placeholder="GitHub"
             :class="{ invalid: github && !github.startsWith('http') }"
           />
-          <input v-model="linkedin" placeholder="LinkedIn (optional)" :class="{ invalid: linkedin && !linkedin.startsWith('http') }" />
-          <input v-model="discord" placeholder="Discord (optional)" :class="{ invalid: discord && !discord.startsWith('http') }"/>
+          <input v-model="linkedin" placeholder="LinkedIn" :class="{ invalid: linkedin && !linkedin.startsWith('http') }" />
+          <input v-model="discord" placeholder="Discord" :class="{ invalid: discord && !discord.startsWith('http') }"/>
           <button type="submit" :disabled="loading">
             {{ loading ? 'Saving...' : isEditing ? 'Save Changes' : 'Post Project' }}
           </button>

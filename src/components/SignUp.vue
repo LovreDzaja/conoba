@@ -19,6 +19,29 @@ watch([email, password], () => {
 
 const handleSignup = async () => {
   error.value = '';
+  email.value = email.value.trim();
+  password.value = password.value.trim();
+  fullName.value = fullName.value.trim();
+
+  if (fullName.value.length > 12) {
+    error.value = 'Full name must be 12 characters or fewer';
+    return;
+  }
+
+  if (password.value.length < 8 || !/[A-Z]/.test(password.value) || !/\d/.test(password.value)) {
+    error.value = 'Password must be at least 8 characters, include an uppercase letter and a number.';
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.value)) {
+    error.value = 'Invalid email format.';
+    return;
+  }
+
+  const sanitize = (str) => str.replace(/[<>]/g, '');
+  fullName.value = sanitize(fullName.value);
+
   const { data, error: signUpError } = await supabase.auth.signUp({
     email: email.value,
     password: password.value,
@@ -43,8 +66,12 @@ const handleSignup = async () => {
   const userId = sessionData?.session?.user?.id;
 
   if (sessionError || !userId) {
-    error.value = 'User session not ready';
+    alert('Check your email');
     return;
+  }
+
+  if (authError?.message?.includes('otp_expired')) {
+    error.value = 'The link has expired. Please request a new one.';
   }
 
   if (profileError) {
@@ -54,10 +81,7 @@ const handleSignup = async () => {
 
   router.push('/');
 };
-
-
 </script>
-
 
 <template>
   <div class="form">
@@ -65,8 +89,8 @@ const handleSignup = async () => {
     <h1>Sign up</h1>
     <p>Create an account</p>
 
-    <input type="text" class="input-field" placeholder="Full Name" v-model="fullName" />
-    <input type="text" class="input-field" placeholder="Email" v-model="email" />
+    <input type="text" class="input-field" placeholder="Full Name" v-model="fullName" maxlength="12" />
+    <input type="email" class="input-field" placeholder="Email" v-model="email" />
 
     <div class="password-wrapper">
       <input :type="showPassword ? 'text' : 'password'" placeholder="Password" class="input-field" v-model="password" />
