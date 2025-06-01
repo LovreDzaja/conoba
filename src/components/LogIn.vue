@@ -30,7 +30,7 @@ watch(resetEmail, () => {
 
 const sendPasswordReset = async () => {
   const { data, error: resetErr } = await supabase.auth.resetPasswordForEmail(resetEmail.value, {
-    redirectTo: 'http://localhost:5173/reset-password' 
+    redirectTo: 'https://conoba.vercel.app/reset-password' 
   });
 
   if (resetErr) {
