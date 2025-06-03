@@ -158,6 +158,26 @@ input:-webkit-autofill:focus {
   color: #555;
 }
 
+
+.project-intro {
+  max-width: 350px;
+  text-align: left;
+  font-family: 'Fjalla One', sans-serif;
+  color: #2a293e;
+}
+
+.project-title {
+  font-size: 3rem;
+  margin: 0;
+  color: #ffa580;
+}
+
+.project-tagline {
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+  color: #7c6e65;
+}
+
 @media (max-width: 768px) {
   .form{
     padding: 25px 50px;
@@ -165,5 +185,20 @@ input:-webkit-autofill:focus {
 
   input{
      min-width: 240px;
+  }
+
+  .login-wrapper {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .project-intro {
+    text-align: center;
+    max-width: 100%;
+  }
+
+  .intro-image {
+    max-width: 70%;
+    margin: 1rem auto 0;
   }
 }
