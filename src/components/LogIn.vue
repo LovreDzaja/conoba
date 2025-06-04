@@ -1,3 +1,88 @@
+<script setup>
+import { ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { supabase } from '../supabase';
+
+import '../assets/css/Login.css';
+
+const email = ref('');
+const password = ref('');
+const error = ref('');
+const router = useRouter();
+
+const showPassword = ref(false);
+const showReset = ref(false);
+
+const resetEmail = ref('');
+const resetMessage = ref('');
+const resetError = ref('');
+
+watch([email, password], () => {
+  if (error.value) error.value = '';
+});
+
+watch(resetEmail, () => {
+  resetError.value = '';
+  resetMessage.value = '';
+});
+
+const isValidEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+
+const sanitize = (str) => str.trim().replace(/[<>]/g, '');
+
+const handleLogin = async () => {
+  email.value = sanitize(email.value);
+  password.value = password.value.trim();
+
+  if (!isValidEmail(email.value)) {
+    error.value = 'Please enter a valid email.';
+    return;
+  }
+
+  if (password.value.length < 8) {
+    error.value = 'Password must be at least 8 characters.';
+    return;
+  }
+
+  const { data, error: authError } = await supabase.auth.signInWithPassword({
+    email: email.value,
+    password: password.value,
+  });
+
+  if (authError) {
+    error.value = authError.message.includes('Invalid login credentials')
+      ? 'Invalid email or password.'
+      : authError.message;
+  } else {
+    localStorage.setItem('token', data.session.access_token);
+    router.push('/home');
+  }
+};
+
+const sendPasswordReset = async () => {
+  resetEmail.value = sanitize(resetEmail.value);
+
+  if (!isValidEmail(resetEmail.value)) {
+    resetError.value = 'Please enter a valid email.';
+    return;
+  }
+
+  const { error: resetErr } = await supabase.auth.resetPasswordForEmail(resetEmail.value, {
+    redirectTo: 'https://conoba.vercel.app/reset-password'
+  });
+
+  if (resetErr) {
+    resetError.value = resetErr.message;
+    resetMessage.value = '';
+  } else {
+    resetMessage.value = 'Check your email for the password reset link.';
+    resetError.value = '';
+    resetEmail.value = '';
+  }
+
+  alert('Please check your email.');
+};
+</script>
 <template>
   <div class="login-container">
     <div class="project-intro">
@@ -51,42 +136,3 @@
     </div>
   </div>
 </template>
-<style scoped>
-
-.project-intro {
-  max-width: 350px;
-  text-align: left;
-  font-family: 'Fjalla One', sans-serif;
-  color: #2a293e;
-}
-
-.project-title {
-  font-size: 3rem;
-  margin: 0;
-  color: #ffa580;
-}
-
-.project-tagline {
-  font-size: 1.2rem;
-  margin-top: 0.5rem;
-  color: #7c6e65;
-}
-
-@media (max-width: 768px) {
-  .login-wrapper {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .project-intro {
-    text-align: center;
-    max-width: 100%;
-  }
-
-  .intro-image {
-    max-width: 70%;
-    margin: 1rem auto 0;
-  }
-}
-
-</style>

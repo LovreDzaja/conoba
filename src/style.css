@@ -3,13 +3,97 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  background-color: #FFF7AF;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --bg-color: #fff8d6;
+  --form-bg: #f8f4e5;
+  --text-color: #2a293e;
+  --accent-color: #ffa580;
+  --button-bg: #ffa580;
+  --button-text: black;
+  --shadow-color: #95a4ff;
+  --border-color: black;
+  --card-bg: #f8f4e5;
+  --input-bg: #f8f4e5;
+  --input-text: #2a293e;
+  --link-color: #007bff;
+}
+
+[data-theme="dark"] {
+  --bg-color: #1e1c1a;
+  --form-bg: #2b2826;
+  --text-color: #f4eee3;
+  --accent-color: #ff9770;
+  --button-bg: #ff9770;
+  --button-text: #f4eee3;
+  --shadow-color: #6a74d6;
+  --border-color: #3a3a3a;
+  --card-bg: #2b2826;
+  --input-bg: #3a3633;
+  --input-text: #f4eee3;
+  --link-color: #8cb4ff;
+}
+
+.theme-ripple {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  background: var(--bg-color);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0.5;
+  transition: background 0.4s ease-in-out;
+}
+
+.theme-ripple.active {
+  animation: ripple-expand 1.2s ease-in-out forwards;
+}
+
+@keyframes ripple-expand {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(20);
+    opacity: 0;
+  }
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: var(--bg-color);
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  transition: background-color 1.6s ease, color 1.6s ease;
+
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--bg-color);
 }
 
 a {
@@ -36,16 +120,19 @@ h1 {
 }
 
 button {
+  background-color: var(--button-bg);
+  color: var(--button-text);
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 1px solid black;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
+  box-shadow: 3px 3px 1px var(--shadow-color), 3px 3px 1px 2px black;
 }
+
 button:hover {
   border-color: #646cff;
 }
@@ -58,22 +145,9 @@ button:focus-visible {
   padding: 2em;
 }
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
+@media (max-width: 480px) {
+  .theme-toggle {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.9rem;
   }
 }
