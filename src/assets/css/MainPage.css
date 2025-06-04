@@ -14,15 +14,10 @@ html, body{
   background-color: var(--bg-color);
 }
 
-.app-wrapper {
-  padding-top: 5rem;
-  padding-bottom: 5rem;
-  max-width: 100%;
-
-  color: var(--text-color);
-}
-
 .navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
   background: var(--form-bg);
   padding: 1rem 2rem;
   border-bottom: 2px solid var(--border-color);
@@ -31,7 +26,6 @@ html, body{
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-  position: relative;
 }
 
 .theme-toggle-wrapper {
@@ -96,14 +90,16 @@ html, body{
 
 .filter-section {
   margin: 1rem auto;
-  max-width: 700px;
-  padding: 0 1rem;
+  max-width: 900px;
+  padding-left: 1rem;
+  padding-right: 1rem;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 1rem;
-  justify-content: space-between;
-  align-items: center;
+  box-sizing: border-box;
 }
+
 
 select {
   font-family: 'Fjalla One', sans-serif;
@@ -356,6 +352,10 @@ input:focus, textarea:focus, select:focus {
     align-items: flex-start;
   }
 
+  .filter-section{
+      padding-top: 5rem; /* Push it below the navbar */
+  }
+
   .project-title {
     font-size: 1.7rem;
   }
@@ -388,6 +388,11 @@ input:focus, textarea:focus, select:focus {
     align-items: center;
   }
 
+  .filter-section{
+      padding-top: 5rem; /* Push it below the navbar */
+  }
+
+
   .user-area {
     flex-direction: row;
     justify-content: space-between;
@@ -411,6 +416,11 @@ input:focus, textarea:focus, select:focus {
     flex-direction: column;
     align-items: stretch;
   }
+
+  .filter-section{
+      padding-top: 40rem; /* Push it below the navbar */
+  }
+
 
   .logo-area {
     justify-content: center;
@@ -480,6 +490,10 @@ input:focus, textarea:focus, select:focus {
     flex-direction: column;
     align-items: stretch;
     padding: 1rem;
+  }
+
+  .filter-section{
+      padding-top: 20rem; 
   }
 
   .theme-toggle-wrapper {

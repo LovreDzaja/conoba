@@ -302,8 +302,8 @@ onMounted(() => {
     </nav>
 
     <div class="filter-section">
-      <label for="filter">Filter by language:</label>
       <div class="filter-section">
+        <label for="filter">Filter by language:</label>
         <div class="lang-filter">
           <button
             v-for="lang in languages.slice(0, -1)"
